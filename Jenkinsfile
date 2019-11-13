@@ -17,7 +17,7 @@ node() {
         openapi: [filename: "city.yaml"],
         environment: [ baseSystemName: "city-service-thorntail",
                        privateBaseUrl: params.PRIVATE_BASE_URL,
-                       privateBasePath: "/",
+                       privateBasePath: "/v1/",
                        stagingPublicBaseURL: "https://city-apicast-staging." + params.PUBLIC_STAGING_WILDCARD_DOMAIN,
                        productionPublicBaseURL: "https://city-apicast-production." + params.PUBLIC_PRODUCTION_WILDCARD_DOMAIN ],
         toolbox: [ openshiftProject: params.NAMESPACE,
@@ -60,9 +60,7 @@ node() {
     ]
     sh """set -e
     echo "Public Staging Base URL is ${proxy.sandbox_endpoint}"
-    curl -sfk -w "ListBeers: %{http_code}\n" -o /dev/null ${proxy.sandbox_endpoint}/beer
-    curl -sfk -w "GetBeer: %{http_code}\n" -o /dev/null ${proxy.sandbox_endpoint}/beer/Weissbier
-    curl -sfk -w "FindBeersByStatus: %{http_code}\n" -o /dev/null ${proxy.sandbox_endpoint}/beer/findByStatus/available
+    curl -sfk -w "List cities: %{http_code}\n" -o /dev/null ${proxy.sandbox_endpoint}/countries/BE/cities
     """
   }
 

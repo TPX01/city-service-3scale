@@ -10,7 +10,7 @@ info:
   version: 1.0.0
 
 host: 'localhost:443'
-basePath: '/v1'
+#basePath: '/v1'
 
 tags:
 - name: City

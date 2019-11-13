@@ -1,0 +1,240 @@
+swagger: "2.0"
+
+info:
+  title: REST API Template
+  description: >-
+    This template illustrates the REST API Standards & Guidelines using an example.
+    The focus is on the structure and 'layout' of a REST API. Therefore, the resource representations
+    (in terms of data elements included) are reduced to the absolute minimum needed to illustrate
+    the standards, guidelines and best practices.
+  version: 1.0.0
+
+host: 'localhost:443'
+basePath: '/v1'
+
+tags:
+- name: City
+
+paths:
+  /countries/{countryCode}/cities:
+    get:
+      operationId: findCitiesByCountryCode
+      tags:
+      - City
+      description: Get a list of cities matching the criteria specified
+      parameters:
+        - name: X-B3-TraceId
+          description: Used for distributed tracing. See also https://github.com/openzipkin/b3-propagation.
+          in: header
+          required: true
+          type: string
+          format: '^[a-f0-9]{16}|[a-f0-9]{32}$'
+        - name: X-B3-SpanId
+          description: Used for distributed tracing. See also https://github.com/openzipkin/b3-propagation.
+          in: header
+          required: true
+          type: string
+          format: '^[a-f0-9]{16}$'
+        - name: countryCode
+          description: ISO 3166 alpha-2 country code
+          in: path
+          required: true
+          type: string
+          format: '[A-Z]{2}'
+        - name: offset
+          description: The number of items to skip before starting to collect the result set.
+          in: query
+          required: false
+          type: integer
+          minimum: 0
+        - name: limit
+          description: The numbers of items to return.
+          in: query
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 20
+      responses:
+        200:
+          description: '200'
+          schema:
+            $ref: '#/definitions/OkWithCityList'
+        201:
+          description: '201'
+          schema:
+            $ref: '#/definitions/Created'
+        202:
+          description: '202'
+          schema:
+            $ref: '#/definitions/Accepted'
+        204:
+          description: '204'
+          schema:
+            $ref: '#/definitions/NoContent'
+        400:
+          description: '400'
+          schema:
+            $ref: '#/definitions/BadRequest'
+        401:
+          description: '401'
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        403:
+          description: '403'
+          schema:
+            $ref: '#/definitions/Forbidden'
+        404:
+          description: '404'
+          schema:
+            $ref: '#/definitions/NotFound'
+        409:
+          description: '409'
+          schema:
+            $ref: '#/definitions/Conflict'
+        500:
+          description: '500'
+          schema:
+            $ref: '#/definitions/InternalServerError'
+
+definitions:
+  OkWithCityList:
+    description: Ok - List of cities returned
+    properties:
+      cityList:
+        type: array
+        items:
+          $ref: '#/definitions/CityList'
+  Created:
+    description: The resource was created
+  Accepted:
+    description: >-
+      The request has been accepted for processing, but the processing has not been completed. The request might
+      or might not eventually be acted upon, as it might be disallowed when processing actually takes place.
+  NoContent:
+    description: Request successfully executed, no content to return
+  BadRequest:
+    description: BadRequest - An invalid request was received
+    properties:
+      errorList:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorList'
+  Unauthorized:
+    description: Unauthorized - The request requires valid authentication credentials, but none were provided
+  Forbidden:
+    description: Forbidden - The caller is not authorized to access this resource
+  NotFound:
+    description: Not found - The requested resource does not exist
+  Conflict:
+    description: >-
+      Conflict - The resource is not in the correct state (e.g. was concurrently modified
+      by another request)
+    properties:
+      errorList:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorList'
+  InternalServerError:
+    description: "Returns an internal server error"
+    properties:
+      errorList:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorList'
+  CityName:
+    description: Name of the city
+    type: string
+    maxLength: 255
+  ZipCode:
+    description: Zip code of a city
+    type: string
+    maxLength: 255
+  CityList:
+    type: object
+    description: A list of cities.
+    properties:
+      count:
+        description: The number of items returned.
+        type: integer
+        minimum: 0
+      totalCount:
+        description: The total number of items matching the filter criteria.
+        type: integer
+        minimum: 0
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/City'
+    required:
+    - count
+    - totalCount
+    - items
+  City:
+    type: object
+    description: Represents a typical city in any country
+    properties:
+      cityName:
+        $ref: '#/definitions/CityName'
+      zipCode:
+        $ref: '#/definitions/ZipCode'
+    required:
+    - cityName
+    - zipCode
+  Country:
+    type: object
+    description: Represents country
+    properties:
+      countryCode:
+        type: string
+      countryName:
+        type: string
+      cities:
+        type: array
+        items:
+          $ref: '#/definitions/City'
+  ErrorList:
+    type: object
+    description: A list of errors.
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    required:
+    - errors
+  Error:
+    type: object
+    description: An error.
+    properties:
+      errorType:
+        type: string
+        enum:
+          - 'BUSINESS'
+          - 'TECHNICAL'
+      errorReference:
+        description: >-
+          16 lower-hex characters. Used for distributed tracing. See also
+          https://github.com/openzipkin/b3-propagation.
+        type: string
+        minLength: 16
+        maxLength: 16
+        pattern: '[a-f0-9]{16}'
+      errorDescription:
+        description: Human readable description of the error.
+        type: string
+      fieldName:
+        description: >-
+          If the error is linked to an individual field, a reference to that
+          field.
+        type: string
+      originalValue:
+        description: >-
+          If the error is linked to an individual field, the original
+          (erroneous) field value.
+        type: string
+    required:
+      - errorType
+      - errorReference
+      - errorCode
+      - errorDescription

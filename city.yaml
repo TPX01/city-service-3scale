@@ -33,7 +33,7 @@ paths:
           in: header
           type: string
           format: '^[a-f0-9]{16}$'
-        - x-data-threescale-name: "user_keys"
+        - x-data-threescale-name: "user_keys",
           name: "user_key",
           description: "API key authenticated by APICast",
           in: "query",

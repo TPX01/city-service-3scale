@@ -26,13 +26,11 @@ paths:
         - name: X-B3-TraceId
           description: Used for distributed tracing. See also https://github.com/openzipkin/b3-propagation.
           in: header
-          required: true
           type: string
           format: '^[a-f0-9]{16}|[a-f0-9]{32}$'
         - name: X-B3-SpanId
           description: Used for distributed tracing. See also https://github.com/openzipkin/b3-propagation.
           in: header
-          required: true
           type: string
           format: '^[a-f0-9]{16}$'
         - name: countryCode
